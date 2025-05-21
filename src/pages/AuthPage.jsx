@@ -111,7 +111,7 @@ export default function AuthPage() {
             </div>
 
             {isLogin && (
-              <div className="flex items-center justify-end">
+              <div className="flex items-center justify-center">
                 <div className="text-sm">
                   <Link
                     to="/forgot-password"
