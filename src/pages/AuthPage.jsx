@@ -26,11 +26,16 @@ export default function AuthPage() {
     e.preventDefault();
     // Mock user data - in real app, verify credentials
     const userData = {
-      id: '123',
+      id: "123",
       name: isLogin ? 'LoggedIn User' : formData.name,
-      email: formData.email
+      email: formData.email,
+      college: 'MIT Moradabad', // Mock data - replace with real input later
+      bio: 'Passionate about skill-sharing!',
+      connectionsCount: 12,
+      skillsHave: ['React', 'UI Design'],
+      skillsWant: ['Machine Learning', 'Public Speaking']
     };
-    
+
     login(userData);
     navigate('/dashboard');
   };

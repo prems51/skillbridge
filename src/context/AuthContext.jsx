@@ -6,7 +6,15 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
   const login = (userData) => {
-    setUser(userData);
+    setUser({
+      name: userData.name || 'User',
+      email: userData.email,
+      college: userData.college || null, // Optional
+      bio: userData.bio || null,         // Optional
+      connectionsCount: userData.connectionsCount || 0,
+      skillsHave: userData.skillsHave || [],
+      skillsWant: userData.skillsWant || []
+    });
   };
 
   const logout = () => {
@@ -14,7 +22,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

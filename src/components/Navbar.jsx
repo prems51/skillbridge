@@ -13,7 +13,7 @@ export default function Navbar() {
               <span className="text-xl font-bold text-indigo-600">SkillBridge</span>
             </Link>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             {user ? (
               <>
@@ -23,7 +23,13 @@ export default function Navbar() {
                 <Link to="/suggestions" className="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
                   Suggestions
                 </Link>
-                <button 
+                <Link
+                  to="/my-profile"
+                  className="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium"
+                >
+                  My Profile
+                </Link>
+                <button
                   onClick={logout}
                   className="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium"
                 >
