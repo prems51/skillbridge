@@ -1,3 +1,6 @@
+import { Link } from "react-router-dom";
+
+
 export default function UserCard({ user }) {
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
@@ -10,7 +13,7 @@ export default function UserCard({ user }) {
           </div>
           <h3 className="text-lg font-medium text-gray-900">{user.name}</h3>
         </div>
-        
+
         <div className="mb-4">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Can teach:</h4>
           <div className="flex flex-wrap">
@@ -21,7 +24,7 @@ export default function UserCard({ user }) {
             ))}
           </div>
         </div>
-        
+
         <div className="mb-4">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Wants to learn:</h4>
           <div className="flex flex-wrap">
@@ -32,10 +35,10 @@ export default function UserCard({ user }) {
             ))}
           </div>
         </div>
-        
-        <button className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">
-          View 
-        </button>
+
+        <Link to={`/user/${user.id}`} className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">
+          View Profile
+        </Link>
       </div>
     </div>
   );

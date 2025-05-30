@@ -65,21 +65,21 @@ export default function MyProfilePage() {
 
                 {/* Statistics (Simplified) */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                    <Link to={"/connections"} className="bg-white p-4 rounded-lg shadow-sm text-center">
                         <p className="text-gray-500 text-sm">Connections</p>
                         <p className="text-2xl font-bold text-indigo-600">
                             {user?.connectionsCount || 0}
                         </p>
-                    </div>
+                    </Link>
                     {/* Optional: Uncomment when ready */}
-                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                    <Link to={"/connections"} className="bg-white p-4 rounded-lg shadow-sm text-center">
                         <p className="text-gray-500 text-sm">Requests Sent</p>
                         <p className="text-2xl font-bold text-amber-600">5</p>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                    </Link>
+                    <Link to={"/connections"} className="bg-white p-4 rounded-lg shadow-sm text-center">
                         <p className="text-gray-500 text-sm">Requests Received</p>
                         <p className="text-2xl font-bold text-emerald-600">3</p>
-                    </div>
+                    </Link>
 
                 </div>
 

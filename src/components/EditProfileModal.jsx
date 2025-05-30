@@ -1,6 +1,8 @@
 // src/components/EditProfileModal.jsx
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
+
 
 export default function EditProfileModal({ isOpen, onClose }) {
     const { user, setUser } = useAuth();
@@ -42,6 +44,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
         // In real app: await UpdateProfileAPI(updatedUser);
         setUser(updatedUser);
         onClose();
+        toast.success("Porfile updated")
     };
 
     if (!isOpen) return null;
