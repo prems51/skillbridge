@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, db } from '../firebase/firebase.config';
+import toast from 'react-hot-toast';
+import { validateEmail, validatePassword } from '../util/validation';
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+
 
 
 export default function AuthPage() {
@@ -12,32 +18,157 @@ export default function AuthPage() {
     email: '',
     password: '',
   });
+  const [errors, setErrors] = useState({
+    email: '',
+    password: '',
+    name: '',
+  });
+
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    minLength: false,
+    hasNumber: false,
+    hasSymbol: false,
+    hasMixedCase: false,
+  });
 
   const { login } = useAuth();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Real-time validation
+    if (name === 'email') {
+      setErrors(prev => ({
+        ...prev,
+        email: validateEmail(value) ? '' : 'Please enter a valid email address'
+      }));
+    }
+
+    if (name === 'password') {
+      const validation = validatePassword(value);
+      setPasswordRequirements({
+        minLength: value.length >= 6,
+        hasNumber: /\d/.test(value),
+        hasSymbol: /[!@#$%^&*(),.?":{}|<>]/.test(value),
+        hasMixedCase: /[a-z]/.test(value) && /[A-Z]/.test(value),
+      });
+      setErrors(prev => ({
+        ...prev,
+        password: validation.isValid ? '' : 'Password does not meet requirements'
+      }));
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Mock user data - in real app, verify credentials
-    const userData = {
-      id: "123",
-      name: isLogin ? 'LoggedIn User' : formData.name,
-      email: formData.email,
-      college: 'MIT Moradabad', // Mock data - replace with real input later
-      bio: 'Passionate about skill-sharing!',
-      connectionsCount: 12,
-      skillsHave: ['React', 'UI Design'],
-      skillsWant: ['Machine Learning', 'Public Speaking']
-    };
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { ...errors };
 
-    login(userData);
-    navigate('/dashboard');
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+      isValid = false;
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+      isValid = false;
+    }
+
+    // Password validation
+    const passwordValidation = validatePassword(formData.password);
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+      isValid = false;
+    } else if (!passwordValidation.isValid) {
+      newErrors.password = 'Password does not meet requirements';
+      isValid = false;
+    }
+
+    // Name validation (for signup)
+    if (!isLogin && !formData.name.trim()) {
+      newErrors.name = 'Name is required';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  // Login function with firebase
+  const loginFB = async (email, password) => {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  };
+
+  // Signup function with firebase
+  const signup = async (email, password, name) => {
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(userCred.user, { displayName: name });
+
+    await setDoc(doc(db, "users", userCred.user.uid), {
+      uid: userCred.user.uid,
+      email,
+      name,
+      createdAt: serverTimestamp(),
+      // role: "user",
+    });
+    return userCred.user;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      // Determine which auth function to use based on isLogin
+      const authAction = isLogin
+        ? () => loginFB(formData.email, formData.password)
+        : () => signup(formData.email, formData.password, formData.name);
+
+      // Execute authentication
+      const user = await authAction();
+      if (!user || !user.uid) {
+        toast.error("error loging in")
+        throw new Error("Authentication failed - no user returned");
+      }
+
+      const userData = {
+        id: user.uid,
+        name: user.displayName || formData.name,
+        email: user.email,
+        // emailVerified: user.emailVerified,
+      };
+
+      // Update auth state and redirect
+      login(userData);
+      navigate('/dashboard');
+
+    } catch (error) {
+      const errorMessage = isLogin
+        ? "Login failed"
+        : "Error signing up";
+
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            errorMessage = "Email already in use";
+            toast.error("email already in use")
+            break;
+          case 'auth/invalid-email':
+            errorMessage = "Invalid email address";
+            toast.error("invalid email id")
+            break;
+          case 'auth/weak-password':
+            errorMessage = "Password is too weak";
+            toast.error("password too weak")
+            break;
+          // Add more cases as needed
+        }
+      }
+      // setAuthError(errorMessage);
+      console.error(`${errorMessage}:`, error);
+    }
   };
 
   return (
@@ -77,6 +208,7 @@ export default function AuthPage() {
                     value={formData.name}
                     onChange={handleChange}
                   />
+                  {errors.name && <span className="error">{errors.name}</span>}
                 </div>
               )}
 
@@ -95,6 +227,7 @@ export default function AuthPage() {
                   value={formData.email}
                   onChange={handleChange}
                 />
+                {errors.email && <span className="error">{errors.email}</span>}
               </div>
 
               <div>
@@ -112,6 +245,26 @@ export default function AuthPage() {
                   value={formData.password}
                   onChange={handleChange}
                 />
+                {errors.password && <span className="error text-red-500 text-sm">{errors.password}</span>}
+                {!isLogin && (
+                  <div className="password-requirements">
+                    <p className='text-gray-700'>Password must contain:</p>
+                    <ul>
+                      <li className={passwordRequirements.minLength ? 'text-green-500 text-sm italic' : 'text-gray-400 italic text-sm'}>
+                        At least 6 characters
+                      </li>
+                      <li className={passwordRequirements.hasNumber ? 'text-green-500 text-sm italic' : 'text-gray-400 italic text-sm'}>
+                        At least 1 number
+                      </li>
+                      <li className={passwordRequirements.hasSymbol ? 'text-green-500 text-sm italic' : 'text-gray-400 italic text-sm'}>
+                        At least 1 symbol (!@#$%^&* etc.)
+                      </li>
+                      <li className={passwordRequirements.hasMixedCase ? 'text-green-500 text-sm italic' : 'text-gray-400 italic text-sm'}>
+                        Both uppercase and lowercase letters
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
 
