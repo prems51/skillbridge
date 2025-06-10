@@ -1,17 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 import LandingPage from "./pages/LandingPage";
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
 import SuggestionsPage from "./pages/SuggestionsPage";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { ProtectedRoute, PublicRoute, AuthRedirect } from "./components/ProtectedRoute";
 import MyProfilePage from "./pages/MyProfilePage";
 import UserProfile from "./pages/UserProfile";
 import Connections from "./pages/Connections";
-
-
-
 
 
 
@@ -22,9 +19,9 @@ function App() {
       <Toaster />
       <Router>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<AuthPage />} />
-          <Route path="/signup" element={<AuthPage />} />
+          <Route path="/" element={<AuthRedirect />} />
+          <Route path="/login" element={<PublicRoute><AuthPage /></PublicRoute>} />
+          <Route path="/signup" element={<PublicRoute><AuthPage /></PublicRoute>} />
           {/* Protected routes */}
           <Route path="/user/:userId"
             element={
@@ -61,6 +58,8 @@ function App() {
             }
           />
 
+          {/* Catch all routes */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

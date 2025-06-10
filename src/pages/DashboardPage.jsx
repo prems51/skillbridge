@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
-import SkillSection from '../components/SkillSection';
+import ConnectionsList from '../components/ConnectionLists';
+import { useAuth } from '../context/AuthContext';
+
+
 
 export default function DashboardPage() {
-  const [skillsHave, setSkillsHave] = useState(['JavaScript', 'React', 'Public Speaking']);
-  const [skillsWant, setSkillsWant] = useState(['Graphic Design', 'Machine Learning']);
+
+  const {user:currUser} = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -16,19 +19,8 @@ export default function DashboardPage() {
             Manage your skills and find peers to learn from or teach
           </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <SkillSection
-            title="Skills I Have"
-            skills={skillsHave}
-            setSkills={setSkillsHave}
-          />
-          <SkillSection
-            title="Skills I Want to Learn"
-            skills={skillsWant}
-            setSkills={setSkillsWant}
-          />
-        </div>
+        {/*  */}
+        <ConnectionsList userId={currUser.uid} />
       </div>
     </div>
   );

@@ -1,6 +1,10 @@
 // src/pages/UserProfile.jsx
 import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
+import ConnectButton from '../components/ConnectButton';
+import { useAuth } from '../context/AuthContext';
+
+
 
 // Mock data. to be replaced with API call later
 const mockUsers = {
@@ -27,8 +31,9 @@ const mockUsers = {
 };
 
 export default function UserProfile() {
+    const { user: currUser } = useAuth(); // this is logged in user
     const { userId } = useParams();
-    const user = mockUsers[userId];
+    const user = mockUsers[userId]; // User whose profile is being viewed
 
     if (!user) return <div>User not found</div>;
 
@@ -77,12 +82,13 @@ export default function UserProfile() {
                             {/* Action Buttons */}
                             <div className="mt-4 sm:mt-0 flex sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2">
                                 {user.connectionStatus === 'not-connected' && (
-                                    <button
-                                        onClick={handleConnect}
-                                        className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
-                                    >
-                                        Connect
-                                    </button>
+                                    // <button
+                                    //     onClick={handleConnect}
+                                    //     className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+                                    // >
+                                    //     Connect
+                                    // </button>
+                                    <ConnectButton targetUserId={userId} currentUserId={currUser.id} />
                                 )}
                                 {user.connectionStatus === 'pending' && (
                                     <button className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md cursor-default">

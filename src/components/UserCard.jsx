@@ -17,7 +17,7 @@ export default function UserCard({ user }) {
         <div className="mb-4">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Can teach:</h4>
           <div className="flex flex-wrap">
-            {user.skillsHave.map(skill => (
+            {user.skillsHave && user.skillsHave.map(skill => (
               <span key={`have-${skill}`} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-2 mb-2">
                 {skill}
               </span>
@@ -28,7 +28,7 @@ export default function UserCard({ user }) {
         <div className="mb-4">
           <h4 className="text-sm font-medium text-gray-500 mb-2">Wants to learn:</h4>
           <div className="flex flex-wrap">
-            {user.skillsWant.map(skill => (
+            {user.skillsWant && user.skillsWant.map(skill => (
               <span key={`want-${skill}`} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2 mb-2">
                 {skill}
               </span>

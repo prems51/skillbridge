@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, browserLocalPersistence, setPersistence } from "firebase/auth";
 import { auth, db } from '../firebase/firebase.config';
 import toast from 'react-hot-toast';
 import { validateEmail, validatePassword } from '../util/validation';
@@ -95,12 +95,14 @@ export default function AuthPage() {
 
   // Login function with firebase
   const loginFB = async (email, password) => {
+    await setPersistence(auth, browserLocalPersistence);
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return userCredential.user;
   };
 
   // Signup function with firebase
   const signup = async (email, password, name) => {
+    await setPersistence(auth, browserLocalPersistence);
     const userCred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(userCred.user, { displayName: name });
 
@@ -145,7 +147,7 @@ export default function AuthPage() {
       navigate('/dashboard');
 
     } catch (error) {
-      const errorMessage = isLogin
+      let errorMessage = isLogin
         ? "Login failed"
         : "Error signing up";
 

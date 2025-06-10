@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, serverTimestamp } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { browserLocalPersistence, getAuth, setPersistence } from 'firebase/auth';
+
 
 
 
@@ -19,7 +20,17 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 export { serverTimestamp };
 const analytics = getAnalytics(app);
+
+// Set persistence (choose one)
+(async () => {
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    console.log("Persistence set successfully");
+  } catch (err) {
+    console.error("Persistence error:", err);
+  }
+})();
